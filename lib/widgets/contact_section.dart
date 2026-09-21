@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/app_theme.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({super.key});
@@ -21,24 +22,46 @@ class _ContactSectionState extends State<ContactSection> {
   bool _isSubmitting = false;
   bool _isSuccess = false;
 
-  final List<Map<String, dynamic>> _contactInfo = [
+  final List<Map<String, dynamic>> _contactCards = [
     {
-      'icon': Icons.email,
+      'icon': Icons.email_rounded,
       'title': 'Email',
       'value': 'nadermina30@gmail.com',
+      'action': 'Send Email',
       'url': 'mailto:nadermina30@gmail.com',
+      'color': AppTheme.primaryColor,
     },
     {
-      'icon': Icons.phone,
-      'title': 'Phone',
+      'icon': Icons.phone_rounded,
+      'title': 'Phone / WhatsApp',
       'value': '+201223397467',
-      'url': 'tel:+201223397467',
+      'action': 'Call / Chat',
+      'url': 'https://wa.me/201223397467',
+      'color': AppTheme.accentEmerald,
     },
     {
-      'icon': Icons.location_on,
+      'icon': Icons.location_on_rounded,
       'title': 'Location',
-      'value': 'Egypt',
-      'url': 'https://maps.google.com/?q=Egypt',
+      'value': 'Cairo, Egypt',
+      'action': 'Open to Remote',
+      'url': 'https://maps.google.com/?q=Cairo,Egypt',
+      'color': AppTheme.accentCyan,
+    },
+    {
+      'icon': Icons.work_rounded,
+      'title': 'LinkedIn',
+      'value': 'Mina Nader',
+      'action': 'Connect',
+      'url': 'https://www.linkedin.com/in/mina-nader-b6b3b526a/',
+      'color': const Color(0xFF0A66C2),
+    },
+    {
+      'icon': Icons.code_rounded,
+      'title': 'GitHub',
+      'value': 'minanader11',
+      'action': 'View Repos',
+      'url': 'https://github.com/minanader11',
+      'color': const Color(0xFFE2E8F0),
     },
   ];
 
@@ -54,11 +77,12 @@ class _ContactSectionState extends State<ContactSection> {
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
-    
+    final isTablet = ResponsiveBreakpoints.of(context).isTablet;
+
     return VisibilityDetector(
       key: const Key('contact-section'),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.3 && !_isVisible) {
+        if (info.visibleFraction > 0.15 && !_isVisible) {
           setState(() {
             _isVisible = true;
           });
@@ -66,18 +90,33 @@ class _ContactSectionState extends State<ContactSection> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 24 : 48,
-          vertical: 80,
+          horizontal: isMobile ? 20 : (isTablet ? 40 : 80),
+          vertical: 90,
         ),
-        color: Theme.of(context).colorScheme.background,
+        color: AppTheme.darkSurface,
         child: Column(
           children: [
             _buildSectionHeader(context),
-            const SizedBox(height: 64),
+            const SizedBox(height: 56),
             if (isMobile) ...[
-              _buildMobileLayout(context),
+              _buildCardsGrid(context, true),
+              const SizedBox(height: 40),
+              _buildContactForm(context),
             ] else ...[
-              _buildDesktopLayout(context),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: _buildCardsGrid(context, false),
+                  ),
+                  const SizedBox(width: 48),
+                  Expanded(
+                    flex: 6,
+                    child: _buildContactForm(context),
+                  ),
+                ],
+              ),
             ],
           ],
         ),
@@ -88,385 +127,438 @@ class _ContactSectionState extends State<ContactSection> {
   Widget _buildSectionHeader(BuildContext context) {
     return Column(
       children: [
-        Text(
-          'Get In Touch',
-          style: Theme.of(context).textTheme.displayMedium,
-          textAlign: TextAlign.center,
-        ).animate(target: _isVisible ? 1 : 0)
-            .fadeIn(duration: 600.ms)
-            .slideY(begin: 0.2),
-        const SizedBox(height: 16),
-        Text(
-          'Have a project in mind? Let\'s talk about it',
-          style: Theme.of(context).textTheme.bodyLarge,
-          textAlign: TextAlign.center,
-        ).animate(target: _isVisible ? 1 : 0)
-            .fadeIn(duration: 600.ms, delay: 200.ms)
-            .slideY(begin: 0.2),
-        const SizedBox(height: 24),
         Container(
-          width: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Text(
+            'GET IN TOUCH',
+            style: TextStyle(
+              fontFamily: AppTheme.fontFamily,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.primaryLight,
+              letterSpacing: 1.5,
+            ),
+          ),
+        )
+            .animate(target: _isVisible ? 1 : 0)
+            .fadeIn(duration: 500.ms)
+            .slideY(begin: 0.2),
+        const SizedBox(height: 12),
+        Text(
+          "Let's Build Something Great Together",
+          style: TextStyle(
+            fontFamily: AppTheme.fontFamily,
+            fontSize: 34,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        )
+            .animate(target: _isVisible ? 1 : 0)
+            .fadeIn(duration: 600.ms, delay: 100.ms)
+            .slideY(begin: 0.2),
+        const SizedBox(height: 12),
+        Container(
+          width: 50,
           height: 4,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
+            gradient: AppTheme.primaryGradient,
             borderRadius: BorderRadius.circular(2),
           ),
-        ).animate(target: _isVisible ? 1 : 0)
-            .scaleX(duration: 600.ms, delay: 400.ms),
+        )
+            .animate(target: _isVisible ? 1 : 0)
+            .scaleX(duration: 600.ms, delay: 250.ms),
+        const SizedBox(height: 14),
+        Text(
+          'Open for full-time opportunities, high-impact consulting, and innovative mobile projects',
+          style: TextStyle(
+            fontFamily: AppTheme.fontFamily,
+            fontSize: 15,
+            color: AppTheme.textLightSecondary,
+          ),
+          textAlign: TextAlign.center,
+        )
+            .animate(target: _isVisible ? 1 : 0)
+            .fadeIn(duration: 600.ms, delay: 200.ms),
       ],
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context) {
-    return Column(
-      children: [
-        _buildContactInfo(context),
-        const SizedBox(height: 48),
-        // _buildContactForm(context),
-      ],
-    );
-  }
-
-  Widget _buildDesktopLayout(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: _buildContactInfo(context)),
-        const SizedBox(width: 64),
-        // Expanded(child: _buildContactForm(context)),
-      ],
-    );
-  }
-
-  Widget _buildContactInfo(BuildContext context) {
+  Widget _buildCardsGrid(BuildContext context, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Contact Information',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ).animate(target: _isVisible ? 1 : 0)
-            .fadeIn(duration: 600.ms, delay: 600.ms)
-            .slideX(begin: -0.2),
-        const SizedBox(height: 24),
-        Text(
-          'Feel free to reach out to me through any of the following methods. I\'m always open to discussing new projects, creative ideas, or opportunities to be part of your vision.',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ).animate(target: _isVisible ? 1 : 0)
-            .fadeIn(duration: 600.ms, delay: 800.ms)
-            .slideY(begin: 0.2),
-        const SizedBox(height: 32),
-        ..._contactInfo.asMap().entries.map((entry) {
+          'Direct Contact Channels',
+          style: TextStyle(
+            fontFamily: AppTheme.fontFamily,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ..._contactCards.asMap().entries.map((entry) {
           final index = entry.key;
-          final info = entry.value;
+          final item = entry.value;
+          final color = item['color'] as Color;
+
           return Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: _ContactInfoItem(
-              icon: info['icon'],
-              title: info['title'],
-              value: info['value'],
-              url: info['url'],
-              isVisible: _isVisible,
-              delay: (1000 + index * 200).ms,
+            padding: const EdgeInsets.only(bottom: 14),
+            child: InkWell(
+              onTap: () => _launchUrl(item['url'] as String),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.darkSurfaceCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppTheme.darkBorder,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: color.withValues(alpha: 0.3)),
+                      ),
+                      child: Icon(
+                        item['icon'] as IconData,
+                        color: color,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item['title'] as String,
+                            style: TextStyle(
+                              fontFamily: AppTheme.fontFamily,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.textLightMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item['value'] as String,
+                            style: TextStyle(
+                              fontFamily: AppTheme.fontFamily,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18,
+                      color: AppTheme.textLightMuted,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          );
-        }).toList(),
-        const SizedBox(height: 32),
-        _buildSocialLinks(context),
+          )
+              .animate(target: _isVisible ? 1 : 0)
+              .fadeIn(duration: 500.ms, delay: (300 + index * 80).ms)
+              .slideX(begin: -0.1);
+        }),
       ],
     );
   }
 
-  Widget _buildSocialLinks(BuildContext context) {
-    final socialLinks = [
-      {'icon': Icons.work, 'url': 'https://www.linkedin.com/in/mina-nader-b6b3b526a/', 'color': const Color(0xFF0077B5)},
-      {'icon': Icons.code, 'url': 'https://github.com/minanader11', 'color': const Color(0xFF333333)},
-   //   {'icon': Icons.alternate_email, 'url': 'https://twitter.com', 'color': const Color(0xFF1DA1F2)},
-    ];
-
-    return Row(
-      children: socialLinks.asMap().entries.map((entry) {
-        final index = entry.key;
-        final social = entry.value;
-        return Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: IconButton(
-            onPressed: () => _launchUrl(social['url'] as String),
-            icon: Icon(social['icon'] as IconData),
-            style: IconButton.styleFrom(
-              backgroundColor: social['color'] as Color,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.all(12),
+  Widget _buildContactForm(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurfaceCard,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppTheme.darkBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Send a Quick Message',
+              style: TextStyle(
+                fontFamily: AppTheme.fontFamily,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
-          ).animate(target: _isVisible ? 1 : 0)
-              .fadeIn(duration: 400.ms, delay: (1800 + index * 100).ms)
-              .scale(begin: const Offset(0.8, 0.8)),
-        );
-      }).toList(),
-    );
+            const SizedBox(height: 8),
+            Text(
+              "I typically respond within 24 hours.",
+              style: TextStyle(
+                fontFamily: AppTheme.fontFamily,
+                fontSize: 14,
+                color: AppTheme.textLightMuted,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            if (_isSuccess) ...[
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentEmerald.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: AppTheme.accentEmerald.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle_rounded,
+                        color: AppTheme.accentEmerald),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Thank you! Your message has been sent. Mina will contact you shortly.',
+                        style: TextStyle(
+                          fontFamily: AppTheme.fontFamily,
+                          color: AppTheme.accentEmerald,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+            ],
+
+            _buildFormField(
+              controller: _nameController,
+              label: 'Your Name',
+              hint: 'e.g. John Doe',
+              icon: Icons.person_outline_rounded,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Please enter your name' : null,
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              controller: _emailController,
+              label: 'Your Email',
+              hint: 'e.g. john@example.com',
+              icon: Icons.alternate_email_rounded,
+              keyboardType: TextInputType.emailAddress,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Please enter your email';
+                }
+                if (!v.contains('@') || !v.contains('.')) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              controller: _subjectController,
+              label: 'Subject',
+              hint: 'e.g. Flutter Project / Hiring Opportunity',
+              icon: Icons.subject_rounded,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Please enter a subject'
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              controller: _messageController,
+              label: 'Message',
+              hint: 'Describe your idea, project, or role...',
+              icon: Icons.chat_bubble_outline_rounded,
+              maxLines: 4,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Please enter your message'
+                  : null,
+            ),
+            const SizedBox(height: 24),
+
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitMessage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.send_rounded, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Send Message',
+                              style: TextStyle(
+                                fontFamily: AppTheme.fontFamily,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    )
+        .animate(target: _isVisible ? 1 : 0)
+        .fadeIn(duration: 600.ms, delay: 400.ms)
+        .slideX(begin: 0.1);
   }
 
-  // Widget _buildContactForm(BuildContext context) {
-  //   return Card(
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(32),
-  //       child: Form(
-  //         key: _formKey,
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             Text(
-  //               'Send Me a Message',
-  //               style: Theme.of(context).textTheme.headlineMedium,
-  //             ).animate(target: _isVisible ? 1 : 0)
-  //                 .fadeIn(duration: 600.ms, delay: 600.ms)
-  //                 .slideX(begin: 0.2),
-  //             const SizedBox(height: 32),
-  //             if (_isSuccess) ...[
-  //               Container(
-  //                 padding: const EdgeInsets.all(16),
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.green.withOpacity(0.1),
-  //                   borderRadius: BorderRadius.circular(8),
-  //                   border: Border.all(color: Colors.green.withOpacity(0.3)),
-  //                 ),
-  //                 child: Row(
-  //                   children: [
-  //                     Icon(Icons.check_circle, color: Colors.green),
-  //                     const SizedBox(width: 12),
-  //                     Expanded(
-  //                       child: Text(
-  //                         'Your message has been sent successfully! I\'ll get back to you soon.',
-  //                         style: TextStyle(color: Colors.green.shade700),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 24),
-  //             ],
-  //             _buildTextField(
-  //               controller: _nameController,
-  //               label: 'Your Name',
-  //               hint: 'John Doe',
-  //               validator: (value) => value?.isEmpty == true ? 'Name is required' : null,
-  //               delay: 800.ms,
-  //             ),
-  //             const SizedBox(height: 24),
-  //             _buildTextField(
-  //               controller: _emailController,
-  //               label: 'Your Email',
-  //               hint: 'john@example.com',
-  //               keyboardType: TextInputType.emailAddress,
-  //               validator: (value) {
-  //                 if (value?.isEmpty == true) return 'Email is required';
-  //                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-  //                   return 'Please enter a valid email';
-  //                 }
-  //                 return null;
-  //               },
-  //               delay: 1000.ms,
-  //             ),
-  //             const SizedBox(height: 24),
-  //             _buildTextField(
-  //               controller: _subjectController,
-  //               label: 'Subject',
-  //               hint: 'Project Inquiry',
-  //               validator: (value) => value?.isEmpty == true ? 'Subject is required' : null,
-  //               delay: 1200.ms,
-  //             ),
-  //             const SizedBox(height: 24),
-  //             _buildTextField(
-  //               controller: _messageController,
-  //               label: 'Your Message',
-  //               hint: 'Tell me about your project...',
-  //               maxLines: 5,
-  //               validator: (value) => value?.isEmpty == true ? 'Message is required' : null,
-  //               delay: 1400.ms,
-  //             ),
-  //             const SizedBox(height: 32),
-  //             SizedBox(
-  //               width: double.infinity,
-  //               child: ElevatedButton(
-  //                 onPressed: _isSubmitting ? null : _submitForm,
-  //                 child: _isSubmitting
-  //                     ? const Row(
-  //                         mainAxisAlignment: MainAxisAlignment.center,
-  //                         children: [
-  //                           SizedBox(
-  //                             width: 20,
-  //                             height: 20,
-  //                             child: CircularProgressIndicator(strokeWidth: 2),
-  //                           ),
-  //                           SizedBox(width: 12),
-  //                           Text('Sending...'),
-  //                         ],
-  //                       )
-  //                     : const Row(
-  //                         mainAxisAlignment: MainAxisAlignment.center,
-  //                         children: [
-  //                           Text('Send Message'),
-  //                           SizedBox(width: 8),
-  //                           Icon(Icons.send, size: 18),
-  //                         ],
-  //                       ),
-  //               ),
-  //             ).animate(target: _isVisible ? 1 : 0)
-  //                 .fadeIn(duration: 600.ms, delay: 1600.ms)
-  //                 .slideY(begin: 0.2),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   ).animate(target: _isVisible ? 1 : 0)
-  //       .fadeIn(duration: 800.ms, delay: 600.ms)
-  //       .slideX(begin: 0.2);
-  // }
-
-  Widget _buildTextField({
+  Widget _buildFormField({
     required TextEditingController controller,
     required String label,
     required String hint,
-    required Duration delay,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
+    required IconData icon,
     int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: const TextStyle(
+        fontFamily: AppTheme.fontFamily,
+        color: Colors.white,
+        fontSize: 14,
+      ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+        prefixIcon: Icon(icon, color: AppTheme.primaryLight, size: 20),
+        filled: true,
+        fillColor: AppTheme.darkBackground,
+        labelStyle: TextStyle(
+          fontFamily: AppTheme.fontFamily,
+          color: AppTheme.textLightMuted,
+          fontSize: 13,
+        ),
+        hintStyle: TextStyle(
+          fontFamily: AppTheme.fontFamily,
+          color: AppTheme.textLightMuted.withValues(alpha: 0.6),
+          fontSize: 13,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: AppTheme.darkBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
         ),
       ),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-    ).animate(target: _isVisible ? 1 : 0)
-        .fadeIn(duration: 600.ms, delay: delay)
-        .slideY(begin: 0.2);
+    );
   }
 
-  void _submitForm() async {
+  void _submitMessage() async {
     if (_formKey.currentState?.validate() == true) {
       setState(() {
         _isSubmitting = true;
       });
 
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      // Launch user's default email client pre-filled
+      final name = Uri.encodeComponent(_nameController.text.trim());
+      final subject = Uri.encodeComponent(_subjectController.text.trim());
+      final body = Uri.encodeComponent(
+        'From: $name\nEmail: ${_emailController.text.trim()}\n\n${_messageController.text.trim()}',
+      );
 
-      setState(() {
-        _isSubmitting = false;
-        _isSuccess = true;
-      });
+      final mailtoUri =
+          'mailto:nadermina30@gmail.com?subject=[Portfolio] $subject&body=$body';
 
-      // Clear form
-      _nameController.clear();
-      _emailController.clear();
-      _subjectController.clear();
-      _messageController.clear();
+      await Future.delayed(const Duration(milliseconds: 600));
 
-      // Reset success message after 5 seconds
-      Future.delayed(const Duration(seconds: 5), () {
-        if (mounted) {
-          setState(() {
-            _isSuccess = false;
-          });
-        }
-      });
+      _launchUrl(mailtoUri);
+
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _isSuccess = true;
+        });
+
+        _nameController.clear();
+        _emailController.clear();
+        _subjectController.clear();
+        _messageController.clear();
+      }
     }
   }
 
   void _launchUrl(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    }
-  }
-}
-
-class _ContactInfoItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final String url;
-  final bool isVisible;
-  final Duration delay;
-
-  const _ContactInfoItem({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.url,
-    required this.isVisible,
-    required this.delay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => _launchUrl(url),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ).animate(target: isVisible ? 1 : 0)
-        .fadeIn(duration: 600.ms, delay: delay)
-        .slideX(begin: -0.2);
-  }
-
-  void _launchUrl(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 }

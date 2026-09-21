@@ -1,106 +1,141 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import '../theme/app_theme.dart';
 
 class FooterSection extends StatelessWidget {
-  const FooterSection({super.key});
+  final VoidCallback? onScrollToTop;
+
+  const FooterSection({super.key, this.onScrollToTop});
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+
     return Container(
-      color: Theme.of(context).colorScheme.surface,
-      padding: const EdgeInsets.all(48),
+      color: AppTheme.darkBackground,
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 80,
+        vertical: 60,
+      ),
       child: Column(
         children: [
+          Divider(color: AppTheme.darkBorder),
+          const SizedBox(height: 40),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Branding
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Portfolio',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'M',
+                            style: TextStyle(
+                              fontFamily: AppTheme.fontFamily,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Mina Nader',
+                        style: TextStyle(
+                          fontFamily: AppTheme.fontFamily,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: 300,
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 340),
                     child: Text(
-                      'Creating beautiful, functional, and user-centered digital experiences that bring your ideas to life.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      'Flutter Developer dedicated to engineering elegant, high-impact mobile solutions.',
+                      style: TextStyle(
+                        fontFamily: AppTheme.fontFamily,
+                        fontSize: 13,
+                        color: AppTheme.textLightMuted,
+                        height: 1.5,
+                      ),
                     ),
                   ),
                 ],
               ),
-              // FloatingActionButton(
-              //   onPressed: _scrollToTop,
-              //   child: const Icon(Icons.keyboard_arrow_up),
-              // ),
+
+              // Scroll to Top FAB
+              if (onScrollToTop != null)
+                Tooltip(
+                  message: 'Scroll to Top',
+                  child: InkWell(
+                    onTap: onScrollToTop,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.darkSurfaceCard,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.darkBorder),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_upward_rounded,
+                        color: AppTheme.accentCyan,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
-          const SizedBox(height: 32),
-          const Divider(),
+          const SizedBox(height: 36),
+          Divider(color: AppTheme.darkBorder),
           const SizedBox(height: 24),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: isMobile
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceBetween,
             children: [
-              // Wrap(
-              //   spacing: 32,
-              //   children: [
-              //     _FooterLink('Home', () {}),
-              //     _FooterLink('About', () {}),
-              //     _FooterLink('Projects', () {}),
-              //     _FooterLink('Skills', () {}),
-              //    // _FooterLink('Testimonials', () {}),
-              //     _FooterLink('Contact', () {}),
-              //   ],
-              // ),
-              // Text(
-              //   '© ${DateTime.now().year} John Doe. All rights reserved.',
-              //   style: Theme.of(context).textTheme.bodySmall,
-              // ),
+              Text(
+                '© 2025 Mina Nader Abdelmalak. All rights reserved.',
+                style: TextStyle(
+                  fontFamily: AppTheme.fontFamily,
+                  fontSize: 12,
+                  color: AppTheme.textLightMuted,
+                ),
+              ),
+              if (!isMobile)
+                Row(
+                  children: [
+                    Text(
+                      'Engineered with Flutter • Cairo Typography',
+                      style: TextStyle(
+                        fontFamily: AppTheme.fontFamily,
+                        fontSize: 12,
+                        color: AppTheme.primaryLight,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Text(
-          //   'Designed and developed with ❤️ using Flutter',
-          //   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          //     color: Theme.of(context).colorScheme.primary,
-          //   ),
-          //   textAlign: TextAlign.center,
-          // ),
         ],
       ),
-    ).animate()
-        .fadeIn(duration: 800.ms)
-        .slideY(begin: 0.2);
-  }
-
-  void _scrollToTop() {
-    // This would typically scroll to top, but since we're in a single page,
-    // we'll just show a simple implementation
-  }
-}
-
-class _FooterLink extends StatelessWidget {
-  final String text;
-  final VoidCallback onTap;
-
-  const _FooterLink(this.text, this.onTap);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-        ),
-      ),
-    );
+    ).animate().fadeIn(duration: 600.ms);
   }
 }
